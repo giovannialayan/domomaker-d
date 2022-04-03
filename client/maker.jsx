@@ -6,14 +6,15 @@ const handleDomo = (e) => {
 
     const name = e.target.querySelector('#domoName').value;
     const age = e.target.querySelector("#domoAge").value;
+    const level = e.target.querySelector("#domoLevel").value;
     const _csrf = e.target.querySelector("#_csrf").value;
 
-    if(!name || !age) {
+    if(!name || !age || !level) {
         helper.handleError('all fields are required');
         return false;
     }
 
-    helper.sendPost(e.target.action, {name, age, _csrf}, loadDomosFromServer);
+    helper.sendPost(e.target.action, {name, age, level, _csrf}, loadDomosFromServer);
 
     return false;
 };
@@ -31,6 +32,8 @@ const DomoForm = (props) => {
             <input id="domoName" type="text" name="name" placeholder="domo name" />
             <label htmlFor="age">age: </label>
             <input id="domoAge" type="number" min="0" name="age" />
+            <label htmlFor="level">level: </label>
+            <input id="domoLevel" type="number" min="0" name="level" />
             <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
             <input className="makeDomoSubmit" type="submit" value="make domo" />
         </form>
@@ -52,9 +55,19 @@ const DomoList = (props) => {
                 <img src="/assets/img/domoface.jpeg" alt="domo face" className="domoFace" />
                 <h3 className="domoName"> name: {domo.name} </h3>
                 <h3 className="domoAge"> age: {domo.age} </h3>
+                <h3 className="domoLevel"> level: {domo.level} </h3>
+                <button id="killDomo" className="deleteDomoButton" type="button" onClick={() => deleteDomo(domo._id)}>
+                    kill {domo.name}
+                </button>
+                <input id="_csrfDelete" type="hidden" name="_csrf" value={props.csrf} />
             </div>
         );
     });
+
+    const deleteDomo = (id) => {
+        const _csrf = document.getElementById('_csrf').value;
+        helper.sendPost('/deleteDomo', {id, _csrf}, loadDomosFromServer);
+    };
 
     return (
         <div className="domoList">
